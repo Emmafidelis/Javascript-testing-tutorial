@@ -72,18 +72,14 @@ describe('validateUserInput', () => {
 })
 
 describe('isPriceInRange', () => {
-  it('should return false when the price is outside the range', () => {
-    expect(isPriceInRange(-10, 0, 100)).toBe(false);
-    expect(isPriceInRange(200, 0, 100)).toBe(false);
-  })
-
-  it('should return true when the price is equal to the min or to the max', () => {
-    expect(isPriceInRange(0, 0, 100)).toBe(true);
-    expect(isPriceInRange(100, 0, 100)).toBe(true);
-  })
-
-  it('should return true when the price is within the range', () => {
-    expect(isPriceInRange(50, 0, 100)).toBe(true);
+  it.each([
+    { scenario: 'price < min', price: -10, result: false },
+    { scenario: 'price = min', price: 0, result: true },
+    { scenario: 'price between min and max', price: 50, result: true },
+    { scenario: 'price > max', price: 200, result: false },
+    { scenario: 'price = max', price: 100, result: true },
+  ])('should return $result when $scenario', ({ price, result}) => {
+    expect(isPriceInRange(price, 0, 100)).toBe(result)
   })
 })
 
@@ -115,27 +111,14 @@ describe('canDrive', () => {
     expect(canDrive(3, 'FR')).toMatch(/invalid/i)
   })
 
-  it('should return false for underage in the US.', () => {
-    expect(canDrive(15, 'US')).toBe(false)
-  })
-
-  it('should return true for min age in the US.', () => {
-    expect(canDrive(16, 'US')).toBe(true)
-  })
-
-  it('should return true for eligible in the US.', () => {
-    expect(canDrive(17, 'US')).toBe(true)
-  })
-
-  it('should return false for underage in the UK.', () => {
-    expect(canDrive(16, 'UK')).toBe(false)
-  })
-
-  it('should return true for min age in the UK.', () => {
-    expect(canDrive(17, 'UK')).toBe(true)
-  })
-
-  it('should return true for eligible in the UK.', () => {
-    expect(canDrive(18, 'UK')).toBe(true)
+  it.each([
+    { age: 15, country: 'US', result: false},
+    { age: 16, country: 'US', result: true},
+    { age: 17, country: 'US', result: true},
+    { age: 16, country: 'UK', result: false},
+    { age: 17, country: 'UK', result: true},
+    { age: 18, country: 'UK', result: true},
+  ])('should return $result for ($age, $country)', ({age, country, result}) => {
+    expect(canDrive(age, country)).toBe(result)
   })
 })
